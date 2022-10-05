@@ -83,24 +83,16 @@ export class MenuItemsService {
         }
     ]
   */
- private getItemWithChildren (arr: any) {
-    const items = arr.map((element: any)=> {
-        if(element.parentId) {
-            const parent = arr.find((item: any) => item.id == element.parentId)
-            parent.children.push(element)
-            return element
-        } else {
-            return element
-        }
-    });
-    return items.filter((item: any) => !item.parentId)
- }
   async getMenuItems() {
     const menuItems =  await this.menuItemRepository.find()
-     const menuItemsWithChildren = menuItems.map((item: any) => {
-        item.children = []
-        return item
-    })
-    return this.getItemWithChildren(menuItemsWithChildren)
+    menuItems.forEach((item: any) => item.children = [])
+    const menuItemWithChildren = menuItems.map((element: any)=> {
+        if(element.parentId) {
+            const parent: any = menuItems.find((item: any) => item.id == element.parentId)
+            parent.children.push(element)
+        } 
+        return element
+    });
+    return menuItemWithChildren.filter((item: any) => !item.parentId)
   }
 }

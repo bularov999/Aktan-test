@@ -97,15 +97,8 @@ export class EventsService {
   async getEventsWithWorkshops() {
     const events = await this.eventRepository.find();
     const workshops = await this.workShopRepository.find();
-    const eventsWithEmptyWorkshops = events.map((item: any) => {
-      item.workshops = [];
-      return item;
-    });
-    return eventsWithEmptyWorkshops.map((item: any) => {
-      const thisEventWorkshops = workshops.filter(
-        (w: any) => w.eventId == item.id,
-      );
-      item.workshops = [...thisEventWorkshops];
+    return events.map((item: any) => {
+      item.workshops = workshops.filter((w) => item.id == w.eventId);
       return item;
     });
   }
@@ -178,18 +171,15 @@ export class EventsService {
   @Get('futureevents')
   async getFutureEventWithWorkshops() {
     const events = await this.eventRepository.find();
-    const workshops = await this.workShopRepository.createQueryBuilder('workshop').where('start > DATE()').getMany()
-    const eventsWithEmptyWorkshops = events.map((item: any) => {
-      item.workshops = [];
-      return item;
+    const workshops = await this.workShopRepository
+      .createQueryBuilder('workshop')
+      .where('start > DATE()')
+      .getMany();
+    return events.filter((item: any) => {
+      item.workshops = workshops.filter((w) => item.id == w.eventId);
+      if (item.workshops.length) {
+        return item;
+      }
     });
-    const eventsWithWorkshops =  eventsWithEmptyWorkshops.map((item: any) => {
-      const thisEventWorkshops = workshops.filter(
-        (w: any) => w.eventId == item.id,
-      );
-      item.workshops = [...thisEventWorkshops];
-      return item;
-    });
-    return eventsWithWorkshops.filter((item) => item.workshops.length)
   }
 }
