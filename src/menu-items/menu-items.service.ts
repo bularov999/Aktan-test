@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { MenuItem } from './entities/menu-item.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UpdateMenuItemDto } from './dto/update-menu-item.dto';
 
 @Injectable()
 export class MenuItemsService {
@@ -89,7 +90,7 @@ export class MenuItemsService {
     const menuItemWithChildren = menuItems.map((element: any)=> {
         if(element.parentId) {
             const parent: any = menuItems.find((item: any) => item.id == element.parentId)
-            parent.children.push(element)
+            parent.children = [...parent.children, element] 
         } 
         return element
     });

@@ -97,10 +97,7 @@ export class EventsService {
   async getEventsWithWorkshops() {
     const events = await this.eventRepository.find();
     const workshops = await this.workShopRepository.find();
-    return events.map((item: any) => {
-      item.workshops = workshops.filter((w) => item.id == w.eventId);
-      return item;
-    });
+    return events.map((item: any) => ({...item, workshops: workshops.filter((w) => item.id == w.eventId)}));
   }
 
   /*
@@ -175,11 +172,8 @@ export class EventsService {
       .createQueryBuilder('workshop')
       .where('start > DATE()')
       .getMany();
-    return events.filter((item: any) => {
-      item.workshops = workshops.filter((w) => item.id == w.eventId);
-      if (item.workshops.length) {
-        return item;
-      }
-    });
+    return events
+                .map((item: any) => ({...item, workshops: workshops.filter((w) => item.id == w.eventId)}))
+                .filter(item => item.workshops.length);
   }
 }
